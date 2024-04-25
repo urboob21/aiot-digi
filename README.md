@@ -71,3 +71,18 @@ _______________________________________________________________________
    # 3. Add dependencies 
     idf_component.yml
 
+
+   # 4. ESP32 CAMERA
+        4.1. Config for Cam
+    CONFIG_ESP32_DEFAULT_CPU_FREQ_240=y
+
+    CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
+    CONFIG_PARTITION_TABLE_OFFSET=0x10000
+
+    CONFIG_FREERTOS_HZ=1000
+    CONFIG_ESPTOOLPY_FLASHFREQ_80M=y
+    CONFIG_ESPTOOLPY_FLASHMODE_QIO=y
+
+    CONFIG_SPIRAM_SUPPORT=y
+    CONFIG_ESP32_SPIRAM_SUPPORT=y
+    CONFIG_SPIRAM_SPEED_80M=y

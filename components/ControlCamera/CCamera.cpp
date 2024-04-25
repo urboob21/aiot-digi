@@ -58,7 +58,7 @@ CCamera::CCamera()
 void CCamera::lightOnOff(bool status)
 {
     // Init the GPIO
-    // gpio_pad_select_gpio(FLASH_GPIO);
+    gpio_reset_pin(FLASH_GPIO); // gpio_pad_select_gpio() has changed to gpio_reset_pin()
 
     // Set the push/pull mode output
     gpio_set_direction(FLASH_GPIO, GPIO_MODE_OUTPUT);
@@ -74,7 +74,7 @@ esp_err_t CCamera::initCamera()
     if (CAM_PIN_PWDN != -1)
     {
         // Init the GPIO
-        // gpio_pad_select_gpio(CAM_PIN_PWDN);
+        gpio_reset_pin(CAM_PIN_PWDN);
         gpio_set_direction(CAM_PIN_PWDN, GPIO_MODE_OUTPUT);
         gpio_set_level(CAM_PIN_PWDN, 0);
     }

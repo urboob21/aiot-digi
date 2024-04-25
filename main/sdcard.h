@@ -70,7 +70,7 @@ bool initNVS_SDCard()
 
     // Init the GPIO
     // Flash ausschalten
-    // gpio_pad_select_gpio(FLASH_GPIO);
+    gpio_reset_pin(FLASH_GPIO);
     gpio_set_direction(FLASH_GPIO, GPIO_MODE_OUTPUT);
     gpio_set_level(FLASH_GPIO, 0);
 
@@ -80,7 +80,7 @@ bool initNVS_SDCard()
 // Loop blink task if cannot init SD card
 void taskNoSDBlink(void *pvParameter)
 {
-    // gpio_pad_select_gpio(BLINK_GPIO);
+    gpio_reset_pin(BLINK_GPIO);
     gpio_set_direction(BLINK_GPIO, GPIO_MODE_OUTPUT);
 
     TickType_t xDelay;
