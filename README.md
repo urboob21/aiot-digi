@@ -56,6 +56,18 @@ D independent
                        REQUIRES spiffs)
     https://stackoverflow.com/questions/70196263/how-to-add-an-esp-idf-library-to-an-external-library
 
+more effect
+_______________________________________________________________________
+FILE(GLOB_RECURSE app_sources ${CMAKE_CURRENT_SOURCE_DIR}/*.*)
+
+list(APPEND EXTRA_COMPONENT_DIRS $ENV{IDF_PATH}/examples/common_components/protocol_examples_common)
+
+idf_component_register(SRCS ${app_sources}
+                    INCLUDE_DIRS "."
+                    REQUIRES esp32-camera esp_http_server nvs_flash)
+
+_______________________________________________________________________
+
    # 3. Add dependencies 
     idf_component.yml
 
