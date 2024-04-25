@@ -2,7 +2,7 @@
 #include <CCamera.h>
 #include "sdcard.h"
 #include <esp_log.h>
-
+#include "connect_wlan.h"
 CCamera cameraESP;
 
 extern "C" void app_main()
@@ -21,7 +21,7 @@ extern "C" void app_main()
     }
 
     // 3. Load Station config from SDCard
-
+    loadWlanFromFile("/sdcard/wlan.ini"); 
     // 4. Create the Wifi Station Mode
 
     // 5. Create HTTP Server
