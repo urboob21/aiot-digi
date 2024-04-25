@@ -20,7 +20,7 @@
 
              - build/
     ========================================================================================
-   # 0. ignore files when commit
+   # 0. If want to ignore some files when commit
    create <.gitignore> file
 {
                 # Ignore compiled binaries
@@ -37,7 +37,7 @@
 
 
 
-   # 1. Each component needs to declare the components that it depend on 
+   # 1. Each component needs to declare the components that it depend on - create / modify CMakeLists.txt file
    CMake.txt 
                 ifd_component_register(...
                             REQUIRES name_component1
@@ -55,3 +55,7 @@ D independent
                        INCLUDE_DIRS "include"
                        REQUIRES spiffs)
     https://stackoverflow.com/questions/70196263/how-to-add-an-esp-idf-library-to-an-external-library
+
+   # 3. Add dependencies 
+    idf_component.yml
+
