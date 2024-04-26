@@ -150,9 +150,13 @@ void loadWlanFromFile(std::string fn)
         hostname = std_hostname;
     }
 
+    while(1){
     printf("\nWLan: %s, %s\n", ssid.c_str(), passphrase.c_str());
     printf("Hostename: %s\n", hostname.c_str());
     printf("Fixed IP: %s, Gateway %s, Netmask %s, DNS %s\n", ipaddress.c_str(), gw.c_str(), netmask.c_str(), dns.c_str());
+    vTaskDelay(pdTICKS_TO_MS(1000));
+    }
+
 
 }
 

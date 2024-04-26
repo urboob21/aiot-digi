@@ -7,21 +7,33 @@ CCamera cameraESP;
 
 extern "C" void app_main()
 {
-    // 1. Settup ESP32CAM
+    // Init the CAMERA
     printf("Reset Camera\n");
     powerResetCamera();
     cameraESP.initCamera();
     cameraESP.lightOnOff(false); // turn off the light
 
-    // 2. Settup SDCard
+    // Init the SDCard
     if (!initNVS_SDCard())
     {
         xTaskCreate(&taskNoSDBlink, "task_NoSDBlink", configMINIMAL_STACK_SIZE * 64, NULL, tskIDLE_PRIORITY + 1, NULL);
         return;
     }
 
-    // 3. Load Station config from SDCard
-    loadWlanFromFile("/sdcard/wlan.ini"); 
+
+    // Tree SD Cardfolder
+    // _______________________________________________________________
+    // sd-card
+    // ├───test (.txt) // testing
+    // ├───config  (model.tflite, config.ini, prevalue.ini )   // store config files
+    // ├───wlan.ini (wifi local area network config)
+    // └───html    (.js, .html, .css)  // store web server files
+    initTheContentSDCard();
+
+    // Load Station config from SDCard
+    loadWlanFromFile("/sdcard/wlan.ini");
+
+
     // 4. Create the Wifi Station Mode
 
     // 5. Create HTTP Server
@@ -31,6 +43,4 @@ extern "C" void app_main()
     // 7. Done Init
 
     // 8. Loop take the picture + MQTT task + Loop Server
-
-    
 }
