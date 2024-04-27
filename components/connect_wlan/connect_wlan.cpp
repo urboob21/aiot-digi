@@ -17,7 +17,7 @@
 #include "esp_event.h"
 #include "esp_log.h"
 #include "nvs_flash.h"
-
+#include <userGPIO.h>
 #include "lwip/err.h"
 #include "lwip/sys.h"
 static const char *MAIN_TAG = "connect_wlan";
@@ -34,7 +34,6 @@ std::string std_hostname = "watermeter";
 /* FreeRTOS event group to signal when we are connected*/
 static EventGroupHandle_t wifi_event_group;
 
-#define BLINK_GPIO GPIO_NUM_33
 /* The event group allows multiple bits for each event, but we only care about two events:*/
 #define CONNECTED_BIT BIT0
 std::vector<string> ZerlegeZeile(std::string input, std::string _delimiter = "")
@@ -72,39 +71,46 @@ void blinkstatus(int dauer, int _anzahl)
         gpio_set_level(BLINK_GPIO, 0);
         vTaskDelay(dauer / portTICK_PERIOD_MS);
         gpio_set_level(BLINK_GPIO, 1);
-        vTaskDelay(dauer / portTICK_PERIOD_MS);          
+        vTaskDelay(dauer / portTICK_PERIOD_MS);
     }
 }
 
-void wifi_connect(){
-    wifi_config_t cfg = { };
-    strcpy((char*)cfg.sta.ssid, (const char*)ssid.c_str());
-    strcpy((char*)cfg.sta.password, (const char*)passphrase.c_str());
-    
-    ESP_ERROR_CHECK( esp_wifi_disconnect() );
-    ESP_ERROR_CHECK( esp_wifi_set_config(ESP_IF_WIFI_STA, &cfg) );
-    ESP_ERROR_CHECK( esp_wifi_connect() );
+void wifi_connect()
+{
+    wifi_config_t cfg = {};
+    strcpy((char *)cfg.sta.ssid, (const char *)ssid.c_str());
+    strcpy((char *)cfg.sta.password, (const char *)passphrase.c_str());
+
+    ESP_ERROR_CHECK(esp_wifi_disconnect());
+    ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &cfg));
+    ESP_ERROR_CHECK(esp_wifi_connect());
 }
 
-static void event_handler(void* arg, esp_event_base_t event_base,
-                                int32_t event_id, void* event_data)
+static void event_handler(void *arg, esp_event_base_t event_base,
+                          int32_t event_id, void *event_data)
 {
-    if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START) {
+    if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START)
+    {
         blinkstatus(200, 1);
         wifi_connect();
-    } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
+    }
+    else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED)
+    {
         blinkstatus(200, 5);
         esp_wifi_connect();
         xEventGroupClearBits(wifi_event_group, CONNECTED_BIT);
-    } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
+    }
+    else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP)
+    {
         xEventGroupSetBits(wifi_event_group, CONNECTED_BIT);
         blinkstatus(1000, 3);
     }
 }
 
-void strinttoip4(std::string ip, int &a, int &b, int &c, int &d) {
+void strinttoip4(std::string ip, int &a, int &b, int &c, int &d)
+{
     std::stringstream s(ip);
-    char ch; //to temporarily store the '.'
+    char ch; // to temporarily store the '.'
     s >> a >> ch >> b >> ch >> c >> ch >> d;
 }
 
@@ -216,24 +222,19 @@ void loadWlanFromFile(std::string fn)
         hostname = std_hostname;
     }
 
-    while (1)
-    {
-        printf("\nWLan: %s, %s\n", ssid.c_str(), passphrase.c_str());
-        printf("Hostename: %s\n", hostname.c_str());
-        printf("Fixed IP: %s, Gateway %s, Netmask %s, DNS %s\n", ipaddress.c_str(), gw.c_str(), netmask.c_str(), dns.c_str());
-        vTaskDelay(pdTICKS_TO_MS(1000));
-    }
+    printf("\nWLan: %s, %s\n", ssid.c_str(), passphrase.c_str());
+    printf("Hostename: %s\n", hostname.c_str());
+    printf("Fixed IP: %s, Gateway %s, Netmask %s, DNS %s\n", ipaddress.c_str(), gw.c_str(), netmask.c_str(), dns.c_str());
 }
 
 void initialise_wifi_fixed_ip()
 {
     wifi_event_group = xEventGroupCreate();
-
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
-
     esp_netif_t *my_sta = esp_netif_create_default_wifi_sta();
 
+    // Config IP, gateway, netmask
     esp_netif_dhcpc_stop(my_sta);
 
     esp_netif_ip_info_t ip_info;
@@ -251,6 +252,7 @@ void initialise_wifi_fixed_ip()
 
     esp_netif_set_ip_info(my_sta, &ip_info);
 
+    //
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
 
@@ -281,7 +283,7 @@ void initialise_wifi_fixed_ip()
     strcpy((char *)wifi_config.sta.password, (const char *)passphrase.c_str());
 
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
-    ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_config));
+    ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
     ESP_ERROR_CHECK(esp_wifi_start());
 
     ESP_LOGI(MAIN_TAG, "wifi_init_sta finished.");
@@ -299,11 +301,12 @@ void initialise_wifi_fixed_ip()
                  ssid.c_str(), passphrase.c_str());
     }
 
-    tcpip_adapter_ip_info_t ip_info2;
-    ESP_ERROR_CHECK(tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip_info2));
-    ipaddress = std::string(ip4addr_ntoa(&ip_info2.ip));
-    netmask = std::string(ip4addr_ntoa(&ip_info2.netmask));
-    gw = std::string(ip4addr_ntoa(&ip_info2.gw));
+    // store IP, gateway, netmask to varias
+    // tcpip_adapter_ip_info_t ip_info2;
+    // ESP_ERROR_CHECK(tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip_info2));
+    // ipaddress = std::string(ip4addr_ntoa(&ip_info2.ip));
+    // netmask = std::string(ip4addr_ntoa(&ip_info2.netmask));
+    // gw = std::string(ip4addr_ntoa(&ip_info2.gw));
 }
 
 void connectToWLAN()

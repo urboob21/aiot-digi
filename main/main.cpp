@@ -33,8 +33,13 @@ extern "C" void app_main()
     // Load Station config from SDCard
     loadWlanFromFile("/sdcard/wlan.ini");
 
-    // 4. Create the Wifi Station Mode
+    // Set STATION MODE - connet to another WIFI local
+    connectToWLAN();
 
+    while(1){
+        printf("Testing");
+        vTaskDelay(1000/portTICK_PERIOD_MS);
+    }
     // 5. Create HTTP Server
 
     // 6. Config via local HTTP server to config file

@@ -16,6 +16,7 @@
 #define MOUNT_POINT_SDCARD "/sdcard"
 #define SSID "Hin"
 #define PASSWORD "12341234"
+
 #define MAX_CHAR_SIZE 64
 const char *TAG = "T_SDCARD";
 sdmmc_card_t *card = NULL;
