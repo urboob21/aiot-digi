@@ -3,6 +3,7 @@
 #include "sdcard.h"
 #include <esp_log.h>
 #include "connect_wlan.h"
+#include "time_sntp.h"
 CCamera cameraESP;
 
 extern "C" void app_main()
@@ -20,7 +21,6 @@ extern "C" void app_main()
         return;
     }
 
-
     // Tree SD Cardfolder
     // _______________________________________________________________
     // sd-card
@@ -36,9 +36,16 @@ extern "C" void app_main()
     // Set STATION MODE - connet to another WIFI local
     connectToWLAN();
 
-    while(1){
-        printf("Testing");
-        vTaskDelay(1000/portTICK_PERIOD_MS);
+    // Init the VietNam timezone
+    setupTime();
+
+    // Testing
+    while (1)
+    {
+        printf("Testing\n");
+        std::string zw = getTimeString("%Y%m%d-%H%M%S");
+        printf("time %s\n", zw.c_str());
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
     // 5. Create HTTP Server
 
