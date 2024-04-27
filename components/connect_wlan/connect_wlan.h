@@ -4,7 +4,7 @@
 #include <string>
 
 void loadWlanFromFile(std::string fn);
-
+void connectToWLAN();
 std::string getHostname();
 std::string getIPAddress();
 std::string getSSID();

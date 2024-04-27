@@ -33,7 +33,6 @@ extern "C" void app_main()
     // Load Station config from SDCard
     loadWlanFromFile("/sdcard/wlan.ini");
 
-
     // 4. Create the Wifi Station Mode
 
     // 5. Create HTTP Server
