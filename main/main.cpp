@@ -4,6 +4,8 @@
 #include <esp_log.h>
 #include "connect_wlan.h"
 #include "time_sntp.h"
+#include "server_main.h"
+
 CCamera cameraESP;
 
 extern "C" void app_main()
@@ -39,15 +41,12 @@ extern "C" void app_main()
     // Init the VietNam timezone
     setupTime();
 
-    // Testing
-    while (1)
-    {
-        printf("Testing\n");
-        std::string zw = getTimeString("%Y%m%d-%H%M%S");
-        printf("time %s\n", zw.c_str());
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }
-    // 5. Create HTTP Server
+    // HTTP Server
+    server = startHTTPWebserver();
+    // registerServerCameraUri(server);    // register server with uri camera
+
+    registerServerMainUri(server,"/sdcard"); // this match with all URIs GET
+    
 
     // 6. Config via local HTTP server to config file
 
