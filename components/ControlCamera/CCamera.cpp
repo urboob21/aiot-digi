@@ -94,3 +94,84 @@ esp_err_t CCamera::initCamera()
 
     return ESP_OK;
 }
+
+// get the params from msg : "?size=VGA&quality=50"
+void CCamera::getCameraParamFromHttpRequest(httpd_req_t *req, int &qual, framesize_t &resol)
+{
+    char _query[100];
+    char _qual[10];
+    char _size[10];
+
+    resol = actualResolution;
+    qual = actualQuality;
+
+    if (httpd_req_get_url_query_str(req, _query, 100) == ESP_OK)
+    {
+        printf("Query: ");
+        printf(_query);
+        printf("\n");
+        if (httpd_query_key_value(_query, "size", _size, 10) == ESP_OK)
+        {
+            if (strcmp(_size, "QVGA") == 0)
+                resol = FRAMESIZE_QVGA; // 320x240
+            if (strcmp(_size, "VGA") == 0)
+                resol = FRAMESIZE_VGA; // 640x480
+            if (strcmp(_size, "SVGA") == 0)
+                resol = FRAMESIZE_SVGA; // 800x600
+            if (strcmp(_size, "XGA") == 0)
+                resol = FRAMESIZE_XGA; // 1024x768
+            if (strcmp(_size, "SXGA") == 0)
+                resol = FRAMESIZE_SXGA; // 1280x1024
+            if (strcmp(_size, "UXGA") == 0)
+                resol = FRAMESIZE_UXGA; // 1600x1200
+        }
+        if (httpd_query_key_value(_query, "quality", _qual, 10) == ESP_OK)
+        {
+            qual = atoi(_qual);
+
+            if (qual > 63)
+                qual = 63;
+            if (qual < 0)
+                qual = 0;
+        }
+    };
+}
+
+/**
+ * @brief Thiết lập chất lượng và kích thước của ảnh cho camera.
+ *
+ * Hàm này được sử dụng để cập nhật chất lượng và kích thước của hình ảnh cho camera.
+ * Nó thực hiện việc thiết lập chất lượng và kích thước mới cho cảm biến camera, cũng như
+ * cập nhật các biến theo dõi chất lượng và kích thước thực tế của ảnh.
+ *
+ * @param qual Giá trị chất lượng mới cho hình ảnh (0-63).
+ * @param resol Kích thước khung hình mới cho hình ảnh (giá trị enum framesize_t).
+ *
+ * @return Không có giá trị trả về.
+ */
+
+void CCamera::setQualitySize(int qual, framesize_t resol)
+{
+    sensor_t *s = esp_camera_sensor_get();
+    s->set_quality(s, qual);
+    s->set_framesize(s, resol);
+    actualResolution = resol;
+    actualQuality = qual;
+
+    if (resol == FRAMESIZE_QVGA)
+    {
+        imageHeight = 240;
+        imageWidth = 320;
+    }
+    if (resol == FRAMESIZE_VGA)
+    {
+        imageHeight = 480;
+        imageWidth = 640;
+    }
+}
+
+
+esp_err_t CCamera::captureImgAndResToHTTP(httpd_req_t *req, int delay)
+{
+    return NULL;
+}
