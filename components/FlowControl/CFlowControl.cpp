@@ -87,10 +87,6 @@ CFlow* CFlowControl::CreateCFlow(std::string _type)
         cfc = new CFlowAlignment(&FlowControll);
         flowalignment = (CFlowAlignment*) cfc;
     }
-    if (toUpper(_type).compare("[ANALOG]") == 0)
-    {
-
-    }
     if (toUpper(_type).compare("[DIGITS]") == 0)
     {
         cfc = new CFlowDigit(&FlowControll);
@@ -142,6 +138,7 @@ void CFlowControl::InitFlow(std::string config)
 
     while ((line.size() > 0) && !(feof(pFile)))
     {
+        // create flows base on config.ini
         cfc = CreateCFlow(line);
         if (cfc)
         {
@@ -208,11 +205,6 @@ bool CFlowControl::doFlow(string time)
         {
             result = true;
         }
-        
-#ifdef DEBUG_DETAIL_ON  
-        LogFile.WriteHeapInfo("CFlowAnalog::doFlow");
-#endif
-
     }
     zw_time = getTimeString("%Y%m%d-%H%M%S");    
     aktstatus = zw_time + ": Flow is done";

@@ -1,16 +1,8 @@
 #include "CFlowDigit.h"
 
-
-// #define OHNETFLITE
-
-#ifndef OHNETFLITE
 // #include "CTfLiteClass.h"
-#endif
 
-// #include "bitmap_image.hpp"
-
-static const char* TAG = "flow_digital";
-
+static const char *TAG = "flow_digital";
 
 void CFlowDigit::SetInitialParameter(void)
 {
@@ -18,18 +10,17 @@ void CFlowDigit::SetInitialParameter(void)
     modelxsize = 1;
     modelysize = 1;
     ListFlowControll = NULL;
-    previousElement = NULL;    
+    previousElement = NULL;
     SaveAllFiles = false;
     disabled = false;
-
-}    
+}
 
 CFlowDigit::CFlowDigit() : CFlowImage(TAG)
 {
     SetInitialParameter();
 }
 
-CFlowDigit::CFlowDigit(std::vector<CFlow*>* lfc) : CFlowImage(lfc, TAG)
+CFlowDigit::CFlowDigit(std::vector<CFlow *> *lfc) : CFlowImage(lfc, TAG)
 {
     SetInitialParameter();
     ListFlowControll = lfc;
@@ -38,12 +29,12 @@ CFlowDigit::CFlowDigit(std::vector<CFlow*>* lfc) : CFlowImage(lfc, TAG)
     {
         if (((*ListFlowControll)[i])->name().compare("CFlowAlignment") == 0)
         {
-            flowpostalignment = (CFlowAlignment*) (*ListFlowControll)[i];
+            flowpostalignment = (CFlowAlignment *)(*ListFlowControll)[i];
         }
     }
 }
 
-CFlowDigit::CFlowDigit(std::vector<CFlow*>* lfc, CFlow *_prev) : CFlowImage(lfc, _prev, TAG)
+CFlowDigit::CFlowDigit(std::vector<CFlow *> *lfc, CFlow *_prev) : CFlowImage(lfc, _prev, TAG)
 {
     SetInitialParameter();
     ListFlowControll = lfc;
@@ -53,9 +44,9 @@ CFlowDigit::CFlowDigit(std::vector<CFlow*>* lfc, CFlow *_prev) : CFlowImage(lfc,
     {
         if (((*ListFlowControll)[i])->name().compare("CFlowAlignment") == 0)
         {
-            flowpostalignment = (CFlowAlignment*) (*ListFlowControll)[i];
+            flowpostalignment = (CFlowAlignment *)(*ListFlowControll)[i];
         }
-    }    
+    }
 }
 
 string CFlowDigit::getReadout()
@@ -73,27 +64,27 @@ string CFlowDigit::getReadout()
     return rst;
 }
 
-bool CFlowDigit::ReadParameter(FILE* pfile, string& aktparamgraph)
+bool CFlowDigit::ReadParameter(FILE *pfile, string &aktparamgraph)
 {
     std::vector<string> zerlegt;
 
     aktparamgraph = trim(aktparamgraph);
 
     if (aktparamgraph.size() == 0)
-        if (!this->GetNextParagraph(pfile, aktparamgraph)) 
+        if (!this->GetNextParagraph(pfile, aktparamgraph))
             return false;
 
-    if ((aktparamgraph.compare("[Digits]") != 0) && (aktparamgraph.compare(";[Digits]") != 0))       // Paragraph passt nich zu MakeImage
+    if ((aktparamgraph.compare("[Digits]") != 0) && (aktparamgraph.compare(";[Digits]") != 0)) // Paragraph passt nich zu MakeImage
         return false;
 
     if (aktparamgraph[0] == ';')
     {
         disabled = true;
-        while (getNextLine(pfile, &aktparamgraph) && !isNewParagraph(aktparamgraph));
+        while (getNextLine(pfile, &aktparamgraph) && !isNewParagraph(aktparamgraph))
+            ;
         printf("[Digits] is disabled !!!\n");
         return true;
     }
-
 
     while (getNextLine(pfile, &aktparamgraph) && !isNewParagraph(aktparamgraph))
     {
@@ -101,7 +92,7 @@ bool CFlowDigit::ReadParameter(FILE* pfile, string& aktparamgraph)
         if ((zerlegt[0] == "LogImageLocation") && (zerlegt.size() > 1))
         {
             LogImageLocation = "/sdcard" + zerlegt[1];
-            isLogImage = true;            
+            isLogImage = true;
         }
         if ((zerlegt[0] == "Model") && (zerlegt.size() > 1))
         {
@@ -114,7 +105,7 @@ bool CFlowDigit::ReadParameter(FILE* pfile, string& aktparamgraph)
         }
         if (zerlegt.size() >= 5)
         {
-            roi* neuroi = new roi;
+            roi *neuroi = new roi;
             neuroi->name = zerlegt[0];
             neuroi->posx = std::stoi(zerlegt[1]);
             neuroi->posy = std::stoi(zerlegt[2]);
@@ -122,7 +113,7 @@ bool CFlowDigit::ReadParameter(FILE* pfile, string& aktparamgraph)
             neuroi->deltay = std::stoi(zerlegt[4]);
             neuroi->resultklasse = -1;
             neuroi->image = NULL;
-            neuroi->image_org = NULL;            
+            neuroi->image_org = NULL;
             ROI.push_back(neuroi);
         }
 
@@ -131,7 +122,6 @@ bool CFlowDigit::ReadParameter(FILE* pfile, string& aktparamgraph)
             if (toUpper(zerlegt[1]) == "TRUE")
                 SaveAllFiles = true;
         }
-
     }
 
     for (int i = 0; i < ROI.size(); ++i)
@@ -143,11 +133,10 @@ bool CFlowDigit::ReadParameter(FILE* pfile, string& aktparamgraph)
     return true;
 }
 
-
 string CFlowDigit::getHTMLSingleStep(string host)
 {
     string result, zw;
-    std::vector<HTMLInfo*> htmlinfo;
+    std::vector<HTMLInfo *> htmlinfo;
 
     result = "<p>Found ROIs: </p> <p><img src=\"" + host + "/img_tmp/alg_roi.jpg\"></p>\n";
     result = result + "Digital Counter: <p> ";
@@ -159,23 +148,23 @@ string CFlowDigit::getHTMLSingleStep(string host)
             zw = "NaN";
         else
         {
-            zw = to_string((int) htmlinfo[i]->val);
+            zw = to_string((int)htmlinfo[i]->val);
         }
-        result = result + "<img src=\"" + host + "/img_tmp/" +  htmlinfo[i]->filename + "\"> " + zw;
+        result = result + "<img src=\"" + host + "/img_tmp/" + htmlinfo[i]->filename + "\"> " + zw;
         delete htmlinfo[i];
     }
-    htmlinfo.clear();    
+    htmlinfo.clear();
 
     return result;
 }
-
 
 bool CFlowDigit::doFlow(string time)
 {
     if (disabled)
         return true;
-        
-    if (!doAlignAndCut(time)){
+
+    if (!doAlignAndCut(time))
+    {
         return false;
     };
 
@@ -196,51 +185,48 @@ bool CFlowDigit::doAlignAndCut(string time)
     for (int i = 0; i < ROI.size(); ++i)
     {
         printf("DigitalDigit %d - Align&Cut\n", i);
-        
+
         caic->CutAndSave(ROI[i]->posx, ROI[i]->posy, ROI[i]->deltax, ROI[i]->deltay, ROI[i]->image_org);
-        if (SaveAllFiles) ROI[i]->image_org->SaveToFile(FormatFileName("/sdcard/img_tmp/" + ROI[i]->name + ".jpg"));
+        if (SaveAllFiles)
+            ROI[i]->image_org->SaveToFile(FormatFileName("/sdcard/img_tmp/" + ROI[i]->name + ".jpg"));
 
         ROI[i]->image_org->Resize(modelxsize, modelysize, ROI[i]->image);
-        if (SaveAllFiles) ROI[i]->image->SaveToFile(FormatFileName("/sdcard/img_tmp/" + ROI[i]->name + ".bmp"));
+        if (SaveAllFiles)
+            ROI[i]->image->SaveToFile(FormatFileName("/sdcard/img_tmp/" + ROI[i]->name + ".bmp"));
     }
 
     return true;
-} 
+}
 
 bool CFlowDigit::doNeuralNetwork(string time)
 {
-//     if (disabled)
-//         return true;
-            
-//     string logPath = CreateLogFolder(time);
+    // if (disabled)
+    //     return true;
 
-// #ifndef OHNETFLITE
-//     CTfLiteClass *tflite = new CTfLiteClass;  
-//     string zwcnn =  FormatFileName("/sdcard" + cnnmodelfile);
-//     printf(zwcnn.c_str());printf("\n");
-//     tflite->LoadModel(zwcnn); 
-//     tflite->MakeAllocate();
-// #endif
+    // string logPath = CreateLogFolder(time);
 
-//     for (int i = 0; i < ROI.size(); ++i)
-//     {
-//         printf("DigitalDigit %d - TfLite\n", i);
+    // CTfLiteClass *tflite = new CTfLiteClass;
+    // string zwcnn = FormatFileName("/sdcard" + cnnmodelfile);
+    // printf(zwcnn.c_str());
+    // printf("\n");
+    // tflite->LoadModel(zwcnn);
+    // tflite->MakeAllocate();
 
-//         ROI[i]->resultklasse = 0;
-// #ifndef OHNETFLITE
-//         ROI[i]->resultklasse = tflite->GetClassFromImageBasis(ROI[i]->image);
+    // for (int i = 0; i < ROI.size(); ++i)
+    // {
+    //     printf("DigitalDigit %d - TfLite\n", i);
 
-// #endif
-//         printf("Result Digit%i: %d\n", i, ROI[i]->resultklasse);
+    //     ROI[i]->resultklasse = 0;
+    //     ROI[i]->resultklasse = tflite->GetClassFromImageBasis(ROI[i]->image);
 
-//         if (isLogImage)
-//         {
-//             LogImage(logPath, ROI[i]->name, NULL, &ROI[i]->resultklasse, time, ROI[i]->image_org);
-//         }
-//     }
-// #ifndef OHNETFLITE
-//         delete tflite;
-// #endif
+    //     printf("Result Digit%i: %d\n", i, ROI[i]->resultklasse);
+
+    //     if (isLogImage)
+    //     {
+    //         LogImage(logPath, ROI[i]->name, NULL, &ROI[i]->resultklasse, time, ROI[i]->image_org);
+    //     }
+    // }
+    // delete tflite;
     return true;
 }
 
@@ -248,11 +234,11 @@ void CFlowDigit::DrawROI(CImageBasis *_zw)
 {
     for (int i = 0; i < ROI.size(); ++i)
         _zw->drawRect(ROI[i]->posx, ROI[i]->posy, ROI[i]->deltax, ROI[i]->deltay, 0, 0, 255, 2);
-}     
+}
 
-std::vector<HTMLInfo*> CFlowDigit::GetHTMLInfo()
+std::vector<HTMLInfo *> CFlowDigit::GetHTMLInfo()
 {
-    std::vector<HTMLInfo*> result;
+    std::vector<HTMLInfo *> result;
 
     for (int i = 0; i < ROI.size(); ++i)
     {
@@ -267,4 +253,3 @@ std::vector<HTMLInfo*> CFlowDigit::GetHTMLInfo()
 
     return result;
 }
-
