@@ -6,6 +6,7 @@
 
 httpd_handle_t server = NULL;
 
+
 // =========================================== URIs main =====================================
 // Navigate to the pages
 esp_err_t index_main_handler(httpd_req_t *req)
@@ -54,6 +55,7 @@ esp_err_t index_main_handler(httpd_req_t *req)
     if (!filename)
     {
         ESP_LOGE(TAG_MAIN_SERVER, "Filename is too long");
+
         /* Respond with 500 Internal Server Error */
         httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Filename too long");
         return ESP_FAIL;

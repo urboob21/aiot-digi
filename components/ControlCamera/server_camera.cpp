@@ -11,6 +11,7 @@ esp_err_t handler_lightOn(httpd_req_t *req)
     cameraESP.lightOnOff(true);
     const char *resp_str = (const char *)req->user_ctx;
     httpd_resp_send(req, resp_str, strlen(resp_str));
+
     return ESP_OK;
 };
 
@@ -28,7 +29,6 @@ esp_err_t handler_capture(httpd_req_t *req)
 {
     int quality;
     framesize_t fSize; // size of picture
-
     cameraESP.getCameraParamFromHttpRequest(req, quality, fSize);
     cameraESP.setQualitySize(quality, fSize);
 
@@ -39,7 +39,6 @@ esp_err_t handler_capture(httpd_req_t *req)
 };
 
 // GET "/save"
-
 esp_err_t handler_capture_save_to_file(httpd_req_t *req)
 {
     char _query[100];
