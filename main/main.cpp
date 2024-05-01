@@ -4,10 +4,6 @@
 #include <esp_log.h>
 #include "connect_wlan.h"
 #include "time_sntp.h"
-#include "server_main.h"
-#include "server_file.h"
-#include <server_tflite.h>
-#include <CImageBasis.h>
 CCamera cameraESP;
 
 extern "C" void app_main()
@@ -49,5 +45,7 @@ extern "C" void app_main()
     registerServerMainUri(server, "/sdcard"); // this match with all URIs GET
     registerServerFileUri(server, "/sdcard"); // handle server with file
 
-    startTFLiteFlow();
+    // 7. Done Init
+
+    // 8. Loop take the picture + MQTT task + Loop Server
 }
