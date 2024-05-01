@@ -2,6 +2,7 @@
 #include "CCamera.h"
 #include <string>
 #include "ServerHelper.h"
+#include "server_tflite.h"
 
 httpd_handle_t server = NULL;
 
@@ -33,7 +34,6 @@ esp_err_t index_main_handler(httpd_req_t *req)
     }
     else
     {
-        // ! TODO:
         filetosend = filetosend + "/html" + std::string(req->uri);
         _pos = filetosend.find("?");
         if (_pos > -1)
@@ -42,12 +42,11 @@ esp_err_t index_main_handler(httpd_req_t *req)
         }
     }
 
-    // ! TODO : if tensorfow lite work
-    // if (filetosend == "/sdcard/html/index.html" && isSetupModusActive())
-    // {
-    //     printf("System ist im Setupmodus --> index.html --> setup.html");
-    //     filetosend = "/sdcard/html/setup.html";
-    // }
+    if (filetosend == "/sdcard/html/index.html" && isSetupModusActive())
+    {
+        printf("System ist im Setupmodus --> index.html --> setup.html");
+        filetosend = "/sdcard/html/setup.html";
+    }
 
     printf("Filename: %s\n", filename);
     printf("File requested: %s\n", filetosend.c_str());
@@ -68,6 +67,31 @@ esp_err_t index_main_handler(httpd_req_t *req)
     // respond with HTTP respond
     httpd_resp_send_chunk(req, NULL, 0);
 
+    return ESP_OK;
+}
+
+
+esp_err_t img_tmp_handler(httpd_req_t *req)
+{
+    char filepath[50];
+    printf("uri: %s\n", req->uri);
+
+    char *base_path = (char*) req->user_ctx;
+    std::string filetosend(base_path);
+
+    const char *filename = getPathFromUri(filepath, base_path,
+                                             req->uri  + sizeof("/img_tmp/") - 1, sizeof(filepath));    
+    printf("1 uri: %s, filename: %s, filepath: %s\n", req->uri, filename, filepath);
+
+    filetosend = filetosend + "/img_tmp/" + std::string(filename);
+    printf("File to upload: %s\n", filetosend.c_str());    
+
+    esp_err_t res = sendFile(req, filetosend);
+    if (res != ESP_OK)
+        return res;
+
+    /* Respond with an empty chunk to signal HTTP response completion */
+    httpd_resp_send_chunk(req, NULL, 0);
     return ESP_OK;
 }
 
@@ -107,16 +131,48 @@ httpd_handle_t startHTTPWebserver(void)
     return NULL;
 }
 
+
+esp_err_t img_tmp_virtual_handler(httpd_req_t *req)
+{
+    char filepath[50];
+
+    printf("uri: %s\n", req->uri);
+
+    char *base_path = (char*) req->user_ctx;
+    std::string filetosend(base_path);
+
+    const char *filename = getPathFromUri(filepath, base_path,
+                                             req->uri  + sizeof("/img_tmp/") - 1, sizeof(filepath));    
+    printf("1 uri: %s, filename: %s, filepath: %s\n", req->uri, filename, filepath);
+
+    filetosend = std::string(filename);
+    printf("File to upload: %s\n", filetosend.c_str()); 
+
+    if (filetosend == "raw.jpg")
+    {
+        return getRawJPG(req); 
+    } 
+
+    esp_err_t zw = getJPG(filetosend, req);
+
+    if (zw == ESP_OK)
+        return ESP_OK;
+
+    // File wird nicht intern bereit gestellt --> klassischer weg:
+    return img_tmp_handler(req);
+}
+
+
 void registerServerMainUri(httpd_handle_t server, const char *basePath)
 {
 
-    // httpd_uri_t img_tmp_handle = {
-    //     .uri = "/img_tmp/*", // Match all URIs of type /path/to/file
-    //     .method = HTTP_GET,
-    //     .handler = img_tmp_virtual_handler,
-    //     .user_ctx = (void *)base_path // Pass server data as context
-    // };
-    // httpd_register_uri_handler(server, &img_tmp_handle);
+    httpd_uri_t img_tmp_handle = {
+        .uri = "/img_tmp/*", // Match all URIs of type /path/to/file
+        .method = HTTP_GET,
+        .handler = img_tmp_virtual_handler,
+        .user_ctx = (void *)basePath // Pass server data as context
+    };
+    httpd_register_uri_handler(server, &img_tmp_handle);
 
     httpd_uri_t main_rest_handle = {
         .uri = "/*", // Match all URIs of type /path/to/file

@@ -39,6 +39,35 @@ struct file_server_data
     char scratch[SCRATCH_BUFSIZE];
 };
 
+void deleteAllInDirectory(std::string _directory)
+{
+    struct dirent *entry;
+    DIR *dir = opendir(_directory.c_str());
+    std::string filename;
+
+    if (!dir)
+    {
+        ESP_LOGE(TAG, "Failed to stat dir : %s", _directory.c_str());
+        return;
+    }
+
+    /* Iterate over all files / folders and fetch their names and sizes */
+    while ((entry = readdir(dir)) != NULL)
+    {
+        if (!(entry->d_type == DT_DIR))
+        {
+            if (strcmp("wlan.ini", entry->d_name) != 0)
+            { // auf wlan.ini soll nicht zugegriffen werden !!!
+                filename = _directory + "/" + std::string(entry->d_name);
+                ESP_LOGI(TAG, "Deleting file : %s", filename.c_str());
+                /* Delete file */
+                unlink(filename.c_str());
+            }
+        };
+    }
+    closedir(dir);
+}
+
 /* Send HTTP response with a run-time generated html consisting of
  * a list of all files and folders under the requested path.
  * In case of SPIFFS this returns empty list when path is any
@@ -217,7 +246,14 @@ static esp_err_t download_get_handler(httpd_req_t *req)
                 if (httpd_query_key_value(buf, "readonly", param, sizeof(param)) == ESP_OK)
                 {
                     ESP_LOGI(TAG, "Found URL query parameter => readonly=%s", param);
-                    readonly = param && strcmp(param, "true") == 0;
+                    if (strcmp(param, "true") == 0)
+                    {
+                        readonly = true;
+                    }
+                    else
+                    {
+                        readonly = false;
+                    }
                 }
             }
         }
@@ -459,7 +495,7 @@ static esp_err_t delete_post_handler(httpd_req_t *req)
         /* Skip leading "/delete" from URI to get filename */
         /* Note sizeof() counts NULL termination hence the -1 */
         const char *filename = getPathFromUri(filepath, ((struct file_server_data *)req->user_ctx)->base_path,
-                                                 req->uri + sizeof("/delete") - 1, sizeof(filepath));
+                                              req->uri + sizeof("/delete") - 1, sizeof(filepath));
         if (!filename)
         {
             /* Respond with 500 Internal Server Error */
@@ -487,7 +523,7 @@ static esp_err_t delete_post_handler(httpd_req_t *req)
         /* Skip leading "/delete" from URI to get filename */
         /* Note sizeof() counts NULL termination hence the -1 */
         const char *filename = getPathFromUri(filepath, ((struct file_server_data *)req->user_ctx)->base_path,
-                                                 req->uri + sizeof("/delete") - 1, sizeof(filepath));
+                                              req->uri + sizeof("/delete") - 1, sizeof(filepath));
         if (!filename)
         {
             /* Respond with 500 Internal Server Error */

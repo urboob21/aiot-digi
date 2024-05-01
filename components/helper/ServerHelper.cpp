@@ -96,34 +96,6 @@ esp_err_t sendFile(httpd_req_t *req, std::string filename)
     return ESP_OK;
 }
 
-void deleteAllInDirectory(std::string _directory)
-{
-    struct dirent *entry;
-    DIR *dir = opendir(_directory.c_str());
-    std::string filename;
-
-    if (!dir)
-    {
-        ESP_LOGE(TAG, "Failed to stat dir : %s", _directory.c_str());
-        return;
-    }
-
-    /* Iterate over all files / folders and fetch their names and sizes */
-    while ((entry = readdir(dir)) != NULL)
-    {
-        if (!(entry->d_type == DT_DIR))
-        {
-            if (strcmp("wlan.ini", entry->d_name) != 0)
-            { // auf wlan.ini soll nicht zugegriffen werden !!!
-                filename = _directory + "/" + std::string(entry->d_name);
-                ESP_LOGI(TAG, "Deleting file : %s", filename.c_str());
-                /* Delete file */
-                unlink(filename.c_str());
-            }
-        };
-    }
-    closedir(dir);
-}
 
 /* Set HTTP response content type according to file extension */
 esp_err_t setContentTypeFromFile(httpd_req_t *req, const char *filename)

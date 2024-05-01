@@ -12,6 +12,7 @@
 #include "CFlowControl.h"
 #include "time_sntp.h"
 #include "esp_timer.h"
+#include "connect_wlan.h"
 
 long autoIntervall = 0;
 bool autoIsrunning = false;
@@ -135,13 +136,12 @@ void taskAutodoFlow(void *pvParameter)
 
     autoIsrunning = tfliteFlow.isAutoStart(autoIntervall);
 
-    // if (isSetupModusActive())
-    // {
-    //     auto_isrunning = false;
-    //     // std::string zw_time = gettimestring(LOGFILE_TIME_FORMAT);
-    //     std::string zw_time = "";
-    //     tfliteflow.doFlowMakeImageOnly(zw_time);
-    // }
+    if (isSetupModusActive())
+    {
+        autoIsrunning = false;
+        std::string zw_time = "";
+        tfliteFlow.doFlowMakeImageOnly(zw_time);
+    }
 
     while (autoIsrunning)
     {
@@ -167,6 +167,21 @@ void taskAutodoFlow(void *pvParameter)
 
     vTaskDelete(NULL); // Delete this task if it exits from the loop above
     xHandletaskAutodoFlow = NULL;
+}
+
+esp_err_t getJPG(std::string _filename, httpd_req_t *req)
+{
+    return tfliteFlow.GetJPGStream(_filename, req);
+}
+
+esp_err_t getRawJPG(httpd_req_t *req)
+{
+    return tfliteFlow.SendRawJPG(req);
+}
+
+bool isSetupModusActive() {
+    return tfliteFlow.getStatusSetupModus();
+    return false;
 }
 
 void startTFLiteFlow()
