@@ -447,21 +447,6 @@ esp_err_t CFlowControl::GetJPGStream(std::string _fn, httpd_req_t *req)
         }
     }
 
-    htmlinfo = GetAllAnalog();
-    for (int i = 0; i < htmlinfo.size(); ++i)
-    {
-        if (_fn == htmlinfo[i]->filename)
-        {
-            if (htmlinfo[i]->image)
-                _send = htmlinfo[i]->image;
-        }
-        if (_fn == htmlinfo[i]->filename_org)
-        {
-            if (htmlinfo[i]->image_org)
-                _send = htmlinfo[i]->image_org;        
-        }
-    }
-
     if (_send)
     {
         ESP_LOGI(TAG, "Sending file : %s ...", _fn.c_str());

@@ -46,6 +46,7 @@ extern "C" void app_main()
     // HTTP Server
     server = startHTTPWebserver();
     registerServerCameraUri(server); // register server with uri camera
+    registerServerTFliteUri(server);    
     registerServerMainUri(server, "/sdcard"); // this match with all URIs GET
     registerServerFileUri(server, "/sdcard"); // handle server with file
 

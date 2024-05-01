@@ -49,7 +49,6 @@ public:
 	std::string getActStatus();
 
 	std::vector<HTMLInfo*> GetAllDigital();
-	std::vector<HTMLInfo*> GetAllAnalog();	
 
 	int CleanTempFolder();
 
