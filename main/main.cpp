@@ -4,10 +4,6 @@
 #include <esp_log.h>
 #include "connect_wlan.h"
 #include "time_sntp.h"
-#include "server_main.h"
-#include "server_file.h"
-#include <server_tflite.h>
-#include <CImageBasis.h>
 CCamera cameraESP;
 
 extern "C" void app_main()
@@ -43,12 +39,19 @@ extern "C" void app_main()
     // Init the VietNam timezone
     setupTime();
 
-    // HTTP Server
-    server = startHTTPWebserver();
-    registerServerCameraUri(server); // register server with uri camera
+    // Testing
+    while (1)
+    {
+        printf("Testing\n");
+        std::string zw = getTimeString("%Y%m%d-%H%M%S");
+        printf("time %s\n", zw.c_str());
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
+    // 5. Create HTTP Server
 
-    registerServerMainUri(server, "/sdcard"); // this match with all URIs GET
-    registerServerFileUri(server, "/sdcard"); // handle server with file
+    // 6. Config via local HTTP server to config file
 
-    startTFLiteFlow();
+    // 7. Done Init
+
+    // 8. Loop take the picture + MQTT task + Loop Server
 }

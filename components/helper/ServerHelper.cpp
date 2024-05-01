@@ -21,6 +21,7 @@ static const char *TAG = "serverhelp";
     
 #define SCRATCH_BUFSIZE  8192 
 char scratch[SCRATCH_BUFSIZE];
+
 /* Copies the full path into destination buffer and returns
  * pointer to path (skipping the preceding base path) */
 const char* getPathFromUri(char *dest, const char *base_path, const char *uri, size_t destsize)
@@ -64,6 +65,7 @@ esp_err_t sendFile(httpd_req_t *req, std::string filename)
     ESP_LOGI(TAG, "Sending file : %s ...", filename.c_str());
     setContentTypeFromFile(req, filename.c_str());
 
+
     /* Retrieve the pointer to scratch buffer for temporary storage */
     char *chunk = scratch;
     size_t chunksize;
@@ -91,7 +93,6 @@ esp_err_t sendFile(httpd_req_t *req, std::string filename)
     return ESP_OK;    
 }
 
-
 /* Set HTTP response content type according to file extension */
 esp_err_t setContentTypeFromFile(httpd_req_t *req, const char *filename)
 {
@@ -108,3 +109,4 @@ esp_err_t setContentTypeFromFile(httpd_req_t *req, const char *filename)
     /* For any other type always set as plain text */
     return httpd_resp_set_type(req, "text/plain");
 }
+

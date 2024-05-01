@@ -5,6 +5,7 @@
 #include <esp_camera.h>
 #include <esp_http_server.h>
 #include <string>
+
 static const char *TAG_CCAMERA = "T_CCamera";
 
 class CCamera
