@@ -1,6 +1,6 @@
 #include "CFlowDigit.h"
 
-// #include "CTfLiteClass.h"
+#include "CTfLiteClass.h"
 
 static const char *TAG = "flow_digital";
 
@@ -200,33 +200,33 @@ bool CFlowDigit::doAlignAndCut(string time)
 
 bool CFlowDigit::doNeuralNetwork(string time)
 {
-    // if (disabled)
-    //     return true;
+    if (disabled)
+        return true;
 
-    // string logPath = CreateLogFolder(time);
+    string logPath = CreateLogFolder(time);
 
-    // CTfLiteClass *tflite = new CTfLiteClass;
-    // string zwcnn = FormatFileName("/sdcard" + cnnmodelfile);
-    // printf(zwcnn.c_str());
-    // printf("\n");
-    // tflite->LoadModel(zwcnn);
-    // tflite->MakeAllocate();
+    CTfLiteClass *tflite = new CTfLiteClass;
+    string zwcnn = FormatFileName("/sdcard" + cnnmodelfile);
+    printf(zwcnn.c_str());
+    printf("\n");
+    tflite->LoadModel(zwcnn);
+    tflite->MakeAllocate();
 
-    // for (int i = 0; i < ROI.size(); ++i)
-    // {
-    //     printf("DigitalDigit %d - TfLite\n", i);
+    for (int i = 0; i < ROI.size(); ++i)
+    {
+        printf("DigitalDigit %d - TfLite\n", i);
 
-    //     ROI[i]->resultklasse = 0;
-    //     ROI[i]->resultklasse = tflite->GetClassFromImageBasis(ROI[i]->image);
+        ROI[i]->resultklasse = 0;
+        ROI[i]->resultklasse = tflite->GetClassFromImageBasis(ROI[i]->image);
 
-    //     printf("Result Digit%i: %d\n", i, ROI[i]->resultklasse);
+        printf("Result Digit%i: %d\n", i, ROI[i]->resultklasse);
 
-    //     if (isLogImage)
-    //     {
-    //         LogImage(logPath, ROI[i]->name, NULL, &ROI[i]->resultklasse, time, ROI[i]->image_org);
-    //     }
-    // }
-    // delete tflite;
+        if (isLogImage)
+        {
+            LogImage(logPath, ROI[i]->name, NULL, &ROI[i]->resultklasse, time, ROI[i]->image_org);
+        }
+    }
+    delete tflite;
     return true;
 }
 
