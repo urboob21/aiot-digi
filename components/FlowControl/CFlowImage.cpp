@@ -82,7 +82,6 @@ void CFlowImage::RemoveOldLogs()
     timeinfo = localtime(&rawtime);
     
     strftime(cmpfilename, 30, LOGFILE_TIME_FORMAT, timeinfo);
-    //ESP_LOGE(TAG, "log file name to compare: %s", cmpfilename);
 	string folderName = string(cmpfilename).LOGFILE_TIME_FORMAT_DATE_EXTR;
 
     DIR *dir = opendir(LogImageLocation.c_str());
@@ -97,7 +96,6 @@ void CFlowImage::RemoveOldLogs()
     while ((entry = readdir(dir)) != NULL) {
         string folderPath = LogImageLocation + "/" + entry->d_name;
 		if (entry->d_type == DT_DIR) {
-			//ESP_LOGI(logTag, "Compare %s %s", entry->d_name, folderName.c_str());	
 			if ((strlen(entry->d_name) == folderName.length()) && (strcmp(entry->d_name, folderName.c_str()) < 0)) {
                 deleted += removeFolder(folderPath.c_str(), logTag);
 			} else {

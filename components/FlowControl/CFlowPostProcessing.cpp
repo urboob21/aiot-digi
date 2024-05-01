@@ -282,12 +282,6 @@ bool CFlowPostProcessing::doFlow(string zwtime)
             isdigit = true;
             digit = (*ListFlowControll)[i]->getReadout();
         }
-        if (((*ListFlowControll)[i])->name().compare("CFlowAnalog") == 0)
-        {
-            isanalog = true;
-            analog = (*ListFlowControll)[i]->getReadout();
-            // AnzahlAnalog = ((CFlowAnalog*)(*ListFlowControll)[i])->AnzahlROIs();
-        }
     }
 
     if (imagetime == 0)
@@ -303,7 +297,6 @@ bool CFlowPostProcessing::doFlow(string zwtime)
 
     //    // TESTING ONLY////////////////////
     //    isdigit = true; digit = "12N";
-    //    isanalog = true; analog = "456";
 
     ReturnRawValue = "";
 
