@@ -9,7 +9,11 @@
                 "${config:idf.espIdfPathWin}/components/**",
                 "${config:idf.espAdfPath}/components/**",
                 "${config:idf.espAdfPathWin}/components/**",
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "D:/esp/v5.2.1/esp-idf/components/freertos/FreeRTOS-Kernel-SMP/portable/linux/include/freertos",
+                "D:/esp/v5.2.1/esp-idf/components/xtensa/deprecated_include/freertos",
+                "D:/esp/v5.2.1/esp-idf/components/xtensa/include",
+                "D:/esp/v5.2.1/esp-idf/components/xtensa/esp32/include"
             ],
             "browse": {
                 "path": [

@@ -4,7 +4,7 @@
 #include <esp_err.h>
 #include <esp_camera.h>
 #include <esp_http_server.h>
-
+#include <string>
 static const char *TAG_CCAMERA = "T_CCamera";
 
 class CCamera
@@ -27,6 +27,7 @@ public:
     void getCameraParamFromHttpRequest(httpd_req_t *req, int &qual, framesize_t &resol);
     void setQualitySize(int qual, framesize_t resol);
     esp_err_t captureImgAndResToHTTP(httpd_req_t *req, int delay = 0);
+    esp_err_t captureAndSaveToFile(std::string nm, int delay = 0);
 };
 
 extern CCamera cameraESP;
