@@ -9,6 +9,7 @@
 #include <esp_log.h>
 #include "esp_timer.h"
 #include "Helper.h"
+#include "CImageBasis.h"
 
 static camera_config_t camera_config = {
     .pin_pwdn = CAM_PIN_PWDN,
@@ -69,6 +70,23 @@ void CCamera::lightOnOff(bool status)
         gpio_set_level(FLASH_GPIO, 1);
     else
         gpio_set_level(FLASH_GPIO, 0);
+}
+
+framesize_t CCamera::textToFramesize(const char * _size)
+{
+    if (strcmp(_size, "QVGA") == 0)
+        return FRAMESIZE_QVGA;       // 320x240
+    if (strcmp(_size, "VGA") == 0)
+        return FRAMESIZE_VGA;      // 640x480
+    if (strcmp(_size, "SVGA") == 0)
+        return FRAMESIZE_SVGA;     // 800x600
+    if (strcmp(_size, "XGA") == 0)
+        return FRAMESIZE_XGA;      // 1024x768
+    if (strcmp(_size, "SXGA") == 0)
+        return FRAMESIZE_SXGA;     // 1280x1024
+    if (strcmp(_size, "UXGA") == 0)
+        return FRAMESIZE_UXGA;     // 1600x1200   
+    return actualResolution;
 }
 
 esp_err_t CCamera::initCamera()
@@ -187,6 +205,64 @@ static size_t jpg_encode_stream(void *arg, size_t index, const void *data, size_
     return len;
 }
 
+void CCamera::enableAutoExposure(int flashdauer)
+{
+    // LEDOnOff(true);
+    lightOnOff(true);
+    const TickType_t xDelay = flashdauer / portTICK_PERIOD_MS;
+    vTaskDelay( xDelay );
+
+    camera_fb_t * fb = esp_camera_fb_get();
+    if (!fb) {
+        ESP_LOGE(TAG_CCAMERA, "Camera Capture Failed");
+    }
+    esp_camera_fb_return(fb);        
+
+    sensor_t * s = esp_camera_sensor_get(); 
+    s->set_gain_ctrl(s, 0);
+    s->set_exposure_ctrl(s, 0);
+
+
+    // LEDOnOff(false);  
+    lightOnOff(false);
+    isFixedExposure = true;
+    waitbeforepictureOrg = flashdauer;
+}
+
+
+bool CCamera::setBrightnessContrastSaturation(int _brightness, int _contrast, int _saturation)
+{
+    bool result = false;
+    sensor_t * s = esp_camera_sensor_get(); 
+    if (_brightness > -100)
+        _brightness = min(2, max(-2, _brightness));
+    if (_contrast > -100)
+        _contrast = min(2, max(-2, _contrast));
+    if (_contrast > -100)
+        s->set_contrast(s, _contrast);
+    if (_brightness > -100)
+        s->set_brightness(s, _brightness);
+
+    if ((_brightness != brightness) && (_brightness > -100))
+        result = true;
+    if ((_contrast != contrast) && (_contrast > -100))
+        result = true;
+    if ((_saturation != saturation) && (_saturation > -100))
+        result = true;
+    
+    if (_brightness > -100)
+        brightness = _brightness;
+    if (_contrast > -100)
+        contrast = _contrast;
+    if (_saturation > -100)
+       saturation = _saturation;
+
+    if (result && isFixedExposure)
+        enableAutoExposure(waitbeforepictureOrg);
+
+    return result;
+}
+
 // Capture the picture
 esp_err_t CCamera::captureImgAndResToHTTP(httpd_req_t *req, int delay)
 {
@@ -247,8 +323,70 @@ esp_err_t CCamera::captureImgAndResToHTTP(httpd_req_t *req, int delay)
     }
 
     return res;
+}
 
-    return NULL;
+
+esp_err_t CCamera::captureToBasisImage(CImageBasis *_Image, int delay)
+{
+    string ftype;
+
+    uint8_t *zwischenspeicher = NULL;
+
+
+    // LEDOnOff(true);
+
+
+    if (delay > 0) 
+    {
+        lightOnOff(true);
+        const TickType_t xDelay = delay / portTICK_PERIOD_MS;
+        vTaskDelay( xDelay );
+    }
+
+
+    camera_fb_t * fb = esp_camera_fb_get();
+    if (!fb) {
+        ESP_LOGE(TAG_CCAMERA, "Camera Capture Failed");
+        // LEDOnOff(false);
+        return ESP_FAIL;
+    }
+
+    int _size = fb->len;
+    zwischenspeicher = (uint8_t*) malloc(_size);
+    for (int i = 0; i < _size; ++i)
+        *(zwischenspeicher + i) = *(fb->buf + i);
+    esp_camera_fb_return(fb);        
+
+    // LEDOnOff(false);  
+
+    if (delay > 0) 
+        lightOnOff(false);
+
+    uint8_t * buf = NULL;
+
+    CImageBasis _zwImage;
+    _zwImage.LoadFromMemory(zwischenspeicher, _size);
+    free(zwischenspeicher);
+
+    stbi_uc* p_target;
+    stbi_uc* p_source;    
+    int channels = 3;
+    int width = imageWidth;
+    int height = imageHeight;
+
+    for (int x = 0; x < width; ++x)
+        for (int y = 0; y < height; ++y)
+        {
+            p_target = _Image->rgb_image + (channels * (y * width + x));
+            p_source = _zwImage.rgb_image + (channels * (y * width + x));
+            p_target[0] = p_source[0];
+            p_target[1] = p_source[1];
+            p_target[2] = p_source[2];
+        }
+
+    free(buf);
+
+    return ESP_OK;    
 }
 
 esp_err_t CCamera::captureAndSaveToFile(std::string nm, int delay)

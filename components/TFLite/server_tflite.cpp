@@ -9,18 +9,19 @@
 #include "esp_camera.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "CFlowControl.h"
 
 long autoIntervall = 0;
 bool autoIsrunning = false;
 
 TaskHandle_t xHandletaskAutodoFlow = NULL;
-// TFLiteFlow tfliteFlow;
+CFlowControl tfliteFlow;
 
 // load the params from config.ini
 // init the tensor flow lite
 void doInit(void){
     string config = "/sdcard/config/config.ini";
-    // tfliteflow.initFlow(config);
+    tfliteFlow.InitFlow(config);
 }
 
 
@@ -28,7 +29,7 @@ void taskAutodoFlow(void *pvParameter)
 {
     // int64_t fr_start, fr_delta_ms;
 
-    // doInit();
+    doInit();
 
     // autoIsrunning = tfliteflow.isAutoStart(autoIntervall);
 
