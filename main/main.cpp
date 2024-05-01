@@ -2,35 +2,52 @@
 #include <CCamera.h>
 #include "sdcard.h"
 #include <esp_log.h>
-
+#include "connect_wlan.h"
+#include "time_sntp.h"
+#include "server_main.h"
+#include "server_file.h"
+#include <server_tflite.h>
+#include <CImageBasis.h>
 CCamera cameraESP;
 
 extern "C" void app_main()
 {
-    // 1. Settup ESP32CAM
+    // Init the CAMERA
     printf("Reset Camera\n");
     powerResetCamera();
     cameraESP.initCamera();
     cameraESP.lightOnOff(false); // turn off the light
 
-    // 2. Settup SDCard
+    // Init the SDCard
     if (!initNVS_SDCard())
     {
         xTaskCreate(&taskNoSDBlink, "task_NoSDBlink", configMINIMAL_STACK_SIZE * 64, NULL, tskIDLE_PRIORITY + 1, NULL);
         return;
     }
 
-    // 3. Load Station config from SDCard
+    // Tree SD Cardfolder
+    // _______________________________________________________________
+    // sd-card
+    // ├───test (.txt) // testing
+    // ├───config  (model.tflite, config.ini, prevalue.ini )   // store config files
+    // ├───wlan.ini (wifi local area network config)
+    // └───html    (.js, .html, .css)  // store web server files
+    initTheContentSDCard();
 
-    // 4. Create the Wifi Station Mode
+    // Load Station config from SDCard
+    loadWlanFromFile("/sdcard/wlan.ini");
 
-    // 5. Create HTTP Server
+    // Set STATION MODE - connet to another WIFI local
+    connectToWLAN();
 
-    // 6. Config via local HTTP server to config file
+    // Init the VietNam timezone
+    setupTime();
 
-    // 7. Done Init
+    // HTTP Server
+    server = startHTTPWebserver();
+    registerServerCameraUri(server); // register server with uri camera
+    registerServerMainUri(server, "/sdcard"); // this match with all URIs GET
+    registerServerFileUri(server, "/sdcard"); // handle server with file
 
-    // 8. Loop take the picture + MQTT task + Loop Server
-
-    
+    startTFLiteFlow();
 }

@@ -71,3 +71,52 @@ _______________________________________________________________________
    # 3. Add dependencies 
     idf_component.yml
 
+
+   # 4. ESP32 CAMERA
+        4.1. Config for Cam
+    CONFIG_ESP32_DEFAULT_CPU_FREQ_160=y
+
+    CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
+    CONFIG_PARTITION_TABLE_OFFSET=0x8000
+
+    CONFIG_SPIRAM_SUPPORT=y
+    CONFIG_ESP32_SPIRAM_SUPPORT=y
+    CONFIG_SPIRAM_SPEED_40M=y
+
+
+   # 5. Bài toán đọc ghi SD card (ngày mai done)
+    tree folder
+    _______________________________________________________________
+    sd-card
+    ├───test (.txt) // testing
+    ├───config  (model.tflite, config.ini, prevalue.ini )   // store config files
+    └───html    (.js, .html, .css)  // store web server files
+
+    1. Hardware ? how - connection
+
+    2. Example code , test ting write, read, delete file
+
+    3. Create the tree as above
+    _______________________________________________________________
+
+   # 6.Bài toán Xử lý ảnh RAW
+   
+   1. Create the web server
+
+   2. Take function
+
+
+   => Done in tomorrow
+
+   ---
+
+   # 6.Bài toán huấn luyện model
+   xDone
+
+   # 7.Bài toán nhận diện xử lý ảnh
+   xJust call the function
+   # 8.Bài phân tích thuật toán đúng
+   xHave the documents, if elseo
+
+   # 9.Bài toán gửi dữ liệu lên server AWS
+   xNone

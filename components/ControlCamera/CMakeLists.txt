@@ -4,4 +4,4 @@ list(APPEND EXTRA_COMPONENT_DIRS $ENV{IDF_PATH}/examples/common_components/proto
 
 idf_component_register(SRCS ${app_sources}
                     INCLUDE_DIRS "."
-                    REQUIRES espressif__esp32-camera esp_http_server nvs_flash header)
+                    REQUIRES espressif__esp32-camera esp_http_server nvs_flash Header esp_timer Helper Image)
