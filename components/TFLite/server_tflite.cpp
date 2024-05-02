@@ -164,7 +164,8 @@ void taskAutodoFlow(void *pvParameter)
             vTaskDelay(xDelay);
         }
     }
-
+        printf("Debug2\n");
+    
     vTaskDelete(NULL); // Delete this task if it exits from the loop above
     xHandletaskAutodoFlow = NULL;
 }

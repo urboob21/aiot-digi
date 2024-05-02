@@ -32,7 +32,7 @@ extern "C" void app_main()
     // ├───config  (model.tflite, config.ini, prevalue.ini )   // store config files
     // ├───wlan.ini (wifi local area network config)
     // └───html    (.js, .html, .css)  // store web server files
-    initTheContentSDCard();
+    // initTheContentSDCard();
 
     // Load Station config from SDCard
     loadWlanFromFile("/sdcard/wlan.ini");
@@ -47,8 +47,8 @@ extern "C" void app_main()
     server = startHTTPWebserver();
     registerServerCameraUri(server); // register server with uri camera
     registerServerTFliteUri(server);    
-    registerServerMainUri(server, "/sdcard"); // this match with all URIs GET
     registerServerFileUri(server, "/sdcard"); // handle server with file
-
+    registerServerMainUri(server, "/sdcard"); // this match with all URIs GET
+    printf("Debug1\n");
     startTFLiteFlow();
 }
